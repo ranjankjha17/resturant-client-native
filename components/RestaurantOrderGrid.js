@@ -52,7 +52,7 @@ const RestaurantOrderGrid = () => {
             <Text style={styles.grid_label}>{order?.pid}</Text>
             <Text style={styles.grid_label}> {order?.name}</Text>
             <Text style={styles.grid_label}> {order?.rate}</Text>
-            <Text style={styles.grid_label}>{}</Text>                 
+            <Text style={styles.grid_label}>{order?.acrate}</Text>                 
             <Text style={styles.grid_label}> {order?.dept_name}</Text>
             <Text style={styles.grid_label}> {order?.dept}</Text>          
         </View>

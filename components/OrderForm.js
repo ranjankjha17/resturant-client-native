@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders } from '../reducers/order';
 import RestaurantOrderGrid from './RestaurantOrderGrid';
+import Logo from './Logo';
 const OrderForm = () => {
     const orders = useSelector(state => state.orders)
     // console.log(orders)
@@ -71,14 +72,9 @@ const OrderForm = () => {
         }
     };
 
-    return (
+    return (        
         <ScrollView contentContainerStyle={styles.container}>
-            {/* <View style={styles.logoContainer}>
-                <Image
-                    source={require('./assets/logo2.bmp')} // Replace with your logo's path
-                    style={styles.logo}
-                />
-            </View> */}
+        <Logo/>          
             <View style={styles.formRow}>
                 <Text style={styles.label}>Table No</Text>
                 <TextInput style={styles.input}
@@ -169,7 +165,7 @@ const styles = StyleSheet.create({
         color: '#5b5f61',
     },
     buttonContainer: {
-        backgroundColor: '#003c75', // Change this color as needed
+        backgroundColor: '#003c75', 
         borderRadius: 5,
         paddingHorizontal: 20,
         paddingVertical: 10,

@@ -58,6 +58,21 @@ const RestaurantOrderGrid = () => {
         </View>
       ))}
     </View>
+
+// {filteredOrders.map((order) => (
+//   <View key={order.pid} style={styles.orderRow}>
+//     <View style={styles.orderItem}>
+//       <Text>Code: {order?.pid}</Text>
+//       <Text>Name: {order?.name}</Text>
+//       <Text>Rate: {order?.rate}</Text>
+//     </View>
+//     <View style={styles.orderItem}>
+//       <Text>DeptName: {order?.dept_name}</Text>
+//       <Text>Dept: {order?.dept}</Text>
+//     </View>
+//   </View>
+// ))}
+
   );
 };
 

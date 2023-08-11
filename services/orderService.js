@@ -1,11 +1,11 @@
 import axios from 'axios'
 
-const BASE_URL='https://resturant-server-sigma.vercel.app'
-// const BASE_URL = 'http://localhost:5000'
+const BASE_URL='https://resturant-server-mssql.vercel.app'
+//const BASE_URL = 'http://localhost:5000'
 
 export const getOrders = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/allOrders`)
+    const response = await axios.get(`${BASE_URL}/api/allProducts`)
     return response.data
 
   } catch (error) {
@@ -18,7 +18,7 @@ export const createOrder = async (orderData) => {
  // console.log("orderdata",orderData)
   try {
 
-    const response = await axios.post(`${BASE_URL}/order`,orderData)
+    const response = await axios.post(`${BASE_URL}/api/order`,orderData)
     return response.data;
 
   } catch (error) {

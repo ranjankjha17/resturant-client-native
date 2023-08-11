@@ -52,9 +52,9 @@ const OrderForm = () => {
             // console.log(data)
             try {
                 const response = await axios.post(
-                    'https://resturant-server-sigma.vercel.app/order', data
+                    'https://resturant-server-mssql.vercel.app/api/order', data
                 );
-                alert("data submit")
+                alert("Your order is submitted")
 
                 //console.log('Form data sent:', response.data);
                 setItemCode('')
@@ -92,15 +92,6 @@ const OrderForm = () => {
                 />
             </View>
             <View style={styles.formRow}>
-                <Text style={styles.label}>Rate</Text>
-                <TextInput style={styles.input}
-                    placeholder="Rate"
-                    value={rate}
-                    editable={false}
-                />
-            </View>
-
-            <View style={styles.formRow}>
                 <Text style={styles.label}>QTY</Text>
                 <TextInput style={styles.input}
                     placeholder="QTY"
@@ -109,6 +100,16 @@ const OrderForm = () => {
 
                 />
             </View>
+            <View style={styles.formRow}>
+                <Text style={styles.label}>Rate</Text>
+                <TextInput style={styles.input}
+                    placeholder="Rate"
+                    value={rate}
+                    editable={false}
+                />
+            </View>
+
+            
             <View style={styles.formRow}>
                 <Text style={styles.label}>Dept No</Text>
                 <TextInput style={styles.input}

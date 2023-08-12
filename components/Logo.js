@@ -9,7 +9,7 @@ const Logo = () => {
   return (
     <View style={styles.logoContainer}>
         <Image
-          source={require('../assets/logo2.bmp')} 
+          source={require('../assets/logo.png')} 
         // source={{
         //     uri: 'https://ibb.co/DWdz1hW',
         //   }}

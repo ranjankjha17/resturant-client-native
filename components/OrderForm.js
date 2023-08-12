@@ -5,8 +5,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders } from '../reducers/order';
 import RestaurantOrderGrid from './RestaurantOrderGrid';
 import Logo from './Logo';
+import StudentList from './OrderList';
+import { addStudent, resetStudents } from '../reducers/temp_order';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const OrderForm = () => {
+    let data;
     const orders = useSelector(state => state.orders)
+    const students = useSelector(state => state.tempOrder.students);
+
     // console.log(orders)
     const dispatch = useDispatch()
     useEffect(() => {
@@ -46,35 +53,61 @@ const OrderForm = () => {
             return;
         }
         else {
-            const data = {
+            data = {
                 tableNo, itemCode, rate, qty, itemName
             }
+            dispatch(addStudent(data));
+            setItemCode('')
+            setDeptNo('')
+            setItemName('')
+            setQty('')
+            setRate('')
+            setTableNo('')
             // console.log(data)
-            try {
-                const response = await axios.post(
-                    'https://resturant-server-mssql.vercel.app/api/order', data
-                );
-                alert("Your order is submitted")
+            // try {
+            //     const response = await axios.post(
+            //         'https://resturant-server-mssql.vercel.app/api/order', data
+            //     );
+            //     alert("Your order is submitted")
 
-                //console.log('Form data sent:', response.data);
-                setItemCode('')
-                setDeptNo('')
-                setItemName('')
-                setQty('')
-                setRate('')
-                setTableNo('')
+            //     //console.log('Form data sent:', response.data);
+            //     setItemCode('')
+            //     setDeptNo('')
+            //     setItemName('')
+            //     setQty('')
+            //     setRate('')
+            //     setTableNo('')
 
-                // You can handle the response here as needed.
-            } catch (error) {
-                console.error('Error sending form data:', error);
-            }
+            //     // You can handle the response here as needed.
+            // } catch (error) {
+            //     console.error('Error sending form data:', error);
+            // }
 
         }
     };
 
-    return (        
+    const handleSaveData = async () => {
+        try {
+            const response = await axios.post(
+                'http://localhost:5000/api/order', students
+            );
+           
+            dispatch(resetStudents());
+            AsyncStorage.removeItem('students');
+            alert("Your order is submitted")
+
+            //console.log('Form data sent:', response.data);
+
+
+            // You can handle the response here as needed.
+        } catch (error) {
+            console.error('Error sending form data:', error);
+        }
+    }
+
+    return (
         <ScrollView contentContainerStyle={styles.container}>
-        <Logo/>          
+            <Logo />
             <View style={styles.formRow}>
                 <Text style={styles.label}>Table No</Text>
                 <TextInput style={styles.input}
@@ -109,7 +142,7 @@ const OrderForm = () => {
                 />
             </View>
 
-            
+
             <View style={styles.formRow}>
                 <Text style={styles.label}>Dept No</Text>
                 <TextInput style={styles.input}
@@ -128,11 +161,20 @@ const OrderForm = () => {
 
                 />
             </View>
-            {/* <View style={styles.buttonContainer}> */}
-            <Button title="Submit" color='#003c75' onPress={handleSubmit} />
-            {/* </View> */}
-            <RestaurantOrderGrid />
+            <View style={styles.buttonContainer}>
+                <View style={styles.button_area}>
+                    <Button title="ADD" color='#003c75' onPress={handleSubmit} />
+                </View>
+                <View style={styles.button_area}>
+                    <Button title="Kot" color='#003c75' onPress={handleSaveData} />
+                </View>
+                <View style={styles.button_area}>
+                    <Button title="Print" color='#003c75' />
+                </View>
+            </View>
 
+            <StudentList />
+            <RestaurantOrderGrid />
         </ScrollView>
     );
 };
@@ -147,8 +189,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 15,
-        // fontSize: 16,
-        // fontWeight:500
     },
     label: {
         flex: 1,
@@ -166,16 +206,17 @@ const styles = StyleSheet.create({
         color: '#5b5f61',
     },
     buttonContainer: {
-        backgroundColor: '#003c75', 
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    button_area: {
+        backgroundColor: '#003c75',
         borderRadius: 5,
         paddingHorizontal: 20,
         paddingVertical: 10,
         color: "#d9e9f9",
     },
-    button_primary: {
-        backgroundColor: '#003c75',
-        color: '#d9e9f9',
-    }
+
 });
 
 export default OrderForm

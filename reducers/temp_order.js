@@ -18,7 +18,7 @@ const studentSlice = createSlice({
       AsyncStorage.setItem('students', JSON.stringify(state.students));
     },
     deleteStudent: (state, action) => {
-      state.students = state.students.filter(student => student.tableNo !== action.payload);
+      state.students = state.students.filter(student => student.rowId !== action.payload);
       AsyncStorage.setItem('students', JSON.stringify(state.students));
     },
     loadStudents: (state, action) => {

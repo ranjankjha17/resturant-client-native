@@ -1,32 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Button } from 'react-native';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders } from '../reducers/order';
-import RestaurantOrderGrid from './RestaurantOrderGrid';
 import Logo from './Logo';
-import StudentList from './OrderList';
 import { addStudent, resetStudents } from '../reducers/temp_order';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { v4 as uuidv4 } from 'uuid';
 
 const OrderForm = () => {
+    const firstInputRef = useRef(null);
     let data;
     const orders = useSelector(state => state.orders)
     const students = useSelector(state => state.tempOrder.students);
 
-    // console.log(orders)
-    const dispatch = useDispatch()
-    useEffect(() => {
-        dispatch(fetchOrders())
-    }, [dispatch])
-
+    const [currentTableType, setCurrentTableType] = useState('')
+    const [currentTime, setCurrentTime] = useState('')
+    const [date, setDate] = useState('')
     const [itemCode, setItemCode] = useState('');
     const [rate, setRate] = useState('');
     const [itemName, setItemName] = useState('');
     const [deptNo, setDeptNo] = useState('')
     const [qty, setQty] = useState('')
     const [tableNo, setTableNo] = useState('')
+    const uuidValue = uuidv4();
+    const rowId = parseInt(uuidValue.substring(0, 4), 16);
+
     //console.log(tableNo)
+
+    // console.log(orders)
+    const dispatch = useDispatch()
+    useEffect(() => {
+        firstInputRef.current.focus();
+        dispatch(fetchOrders())
+        fetchDate()
+        getCurrentTime()
+        fetchTable(tableNo)
+    }, [dispatch,tableNo])
+
+
     const handleSearch = (text) => {
         setItemCode(text);
         const foundItem = orders.find((item) => item.pid === parseInt(text));
@@ -54,7 +66,7 @@ const OrderForm = () => {
         }
         else {
             data = {
-                tableNo, itemCode, rate, qty, itemName
+                rowId,tableNo, itemCode, rate, qty, itemName
             }
             dispatch(addStudent(data));
             setItemCode('')
@@ -63,6 +75,7 @@ const OrderForm = () => {
             setQty('')
             setRate('')
             setTableNo('')
+
             // console.log(data)
             // try {
             //     const response = await axios.post(
@@ -89,13 +102,13 @@ const OrderForm = () => {
     const handleSaveData = async () => {
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/order', students
+                'https://resturant-server-mssql.vercel.app/api/order', students
             );
-           
+
             dispatch(resetStudents());
             AsyncStorage.removeItem('students');
             alert("Your order is submitted")
-
+            firstInputRef.current.focus();
             //console.log('Form data sent:', response.data);
 
 
@@ -105,12 +118,65 @@ const OrderForm = () => {
         }
     }
 
+    const fetchDate = async () => {
+        const timeoutDuration = 10000;
+        try {
+            let response = await fetch('https://resturant-server-mssql.vercel.app/api/date', { timeout: timeoutDuration })
+            let result = await response.json()
+            // console.log(result[0].TDate)
+            const dateString = result[0].TDate
+            const date = new Date(dateString)
+            const day = date.getUTCDate()
+            const month = date.getUTCMonth() + 1
+            const year = date.getUTCFullYear()
+            const formattedDay = day < 10 ? `0${day}` : day;
+            const formattedMonth = month < 10 ? `0${month}` : month;
+            const formattedDateStr = `${formattedDay}-${formattedMonth}-${year}`;
+            console.log(formattedDateStr)
+            setDate(formattedDateStr)
+        } catch (error) {
+            console.error('Network request failed:', error);
+
+        }
+    }
+
+    const getCurrentTime = () => {
+        const currentDate = new Date();
+        const hours = currentDate.getHours();
+        const minutes = currentDate.getMinutes();
+        const seconds = currentDate.getSeconds();
+        const formattedHours = hours < 10 ? `0${hours}` : hours;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds; const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+        setCurrentTime(currentTime)
+    }
+
+    const fetchTable = async (tableNo) => {
+        let response = await fetch('https://resturant-server-mssql.vercel.app/api/table')
+        let tables = await response.json()
+        console.log(tables)
+        const foundTable=tables.filter((e)=>e.TableNo===parseInt(tableNo))
+        console.log(foundTable[0]?.TypeT)       
+        if (foundTable) {         
+            setCurrentTableType(foundTable[0]?.TypeT)
+        } 
+      
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Logo />
+            <View style={styles.header}>
+                <Text style={styles.date}>{date}</Text>
+                <Logo style={styles.logo} />
+                <View>
+                <Text style={styles.time}>{currentTime}</Text>
+                <Text style={styles.tableType}>{currentTableType}</Text>
+                </View>
+            </View>
             <View style={styles.formRow}>
                 <Text style={styles.label}>Table No</Text>
                 <TextInput style={styles.input}
+                    ref={firstInputRef}
                     placeholder="Table No"
                     value={tableNo}
                     onChangeText={(value) => setTableNo(value)}
@@ -141,8 +207,6 @@ const OrderForm = () => {
                     editable={false}
                 />
             </View>
-
-
             <View style={styles.formRow}>
                 <Text style={styles.label}>Dept No</Text>
                 <TextInput style={styles.input}
@@ -172,16 +236,17 @@ const OrderForm = () => {
                     <Button title="Print" color='#003c75' />
                 </View>
             </View>
-
-            <StudentList />
-            <RestaurantOrderGrid />
+            {/* <OrderList/> */}
+            {/* <OrderGridTable/> */}
+            {/* <RestaurantOrderGrid /> */}
         </ScrollView>
+
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
+        flex: 1,
         padding: 20,
         backgroundColor: '#eef4fc',
     },
@@ -216,6 +281,37 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         color: "#d9e9f9",
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    logo: {
+        flex: 2,
+        //marginLeft:48,
+    },
+    date: {
+        flex: 1,
+        fontSize: 16,
+        color: 'red',
+        fontWeight: 500,
+        marginTop: 88
+    },
+    time: {
+        flex: 1,
+        fontSize: 16,
+        color: 'red',
+        fontWeight: 500,
+        marginTop: 88,
+        //marginLeft: 16,
+    },
+    tableType:{
+        flex:1,
+        fontSize: 16,
+        color: 'red',
+        fontWeight: 500,
+        // marginTop: 88,
+    }
+
 
 });
 

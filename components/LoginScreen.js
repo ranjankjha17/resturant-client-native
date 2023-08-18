@@ -15,36 +15,42 @@ const LoginScreen = () => {
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
     const handleLogin = async () => {
+        if (
+            userID === '' ||
+            password === '' 
+           
+        ) {
+            alert('UserID and Password are required');
+            
+        }else{      
         console.log('userID:', userID);
         console.log('Password:', password);
         let data = { userID, password }
         let response = await createLogin(data)
         console.log(response.token)
         const token = response.token
-
-        dispatch(login());
+        dispatch(login(userID));
         try {
-            await AsyncStorage.setItem('token', token); // Replace with the actual token
+            await AsyncStorage.setItem('loginToken', token); 
         } catch (error) {
             console.log('Error storing token:', error);
         }
-
-
-        if (token) {
-           
+        if (token) {           
             navigation.navigate('DashboardScreen');
         }
     };
-    // useEffect(() => {
-    //     let isLoggedIn = checkLoggedInStatus()
-    //     if (isLoggedIn) {
-    //         navigation.navigate('DashboardScreen');
-    //     }else{
-    //         navigation.navigate('LoginScreen')
-    //     }
-    // }, [])
+
+}
+    useEffect(() => {
+        let isLoggedIn = checkLoggedInStatus()
+        if (isLoggedIn) {
+            navigation.navigate('DashboardScreen');
+        }else{
+            navigation.navigate('LoginScreen')
+        }
+    }, [dispatch])
     const checkLoggedInStatus = async () => {
-        const storedToken = await AsyncStorage.getItem('token');
+        const storedToken = await AsyncStorage.getItem('loginToken');
         console.log(storedToken)
         if (storedToken) {
             dispatch(login());
@@ -71,7 +77,10 @@ const LoginScreen = () => {
                 value={password}
                 onChangeText={setPassword}
             />
-            <Button title="Login" onPress={handleLogin} />
+            <View style={styles.button_area}>
+            <Button title="Login"  onPress={handleLogin} />
+            </View>
+          
         </View>
     );
 };
@@ -81,11 +90,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        // backgroundColor:'#003c75'
     },
     heading: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        // color:"#ffffff"
     },
     input: {
         width: '80%',
@@ -94,7 +105,15 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 10,
-    }
+    },
+    // button_area: {
+    //     backgroundColor: '#fff',
+    //     borderRadius: 5,
+    //     paddingHorizontal: 20,
+    //     paddingVertical: 10,
+    //     color: "#003c75",
+      
+    // },
 });
 
 export default LoginScreen;

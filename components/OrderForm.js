@@ -7,15 +7,23 @@ import Logo from './Logo';
 import { addStudent, resetStudents } from '../reducers/temp_order';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
 
 const OrderForm = () => {
     const firstInputRef = useRef(null);
+    const secondInputRef = useRef(null);
     let data;
     const orders = useSelector(state => state.orders)
     const students = useSelector(state => state.tempOrder.students);
+    const user_ID = useSelector(state => state.auth.userID)
+   //const userID="bhanu"
+    console.log('user_ID', user_ID)
+   // const totalAmount = useSelector(state => state.tempOrder.totalAmount)
+    //console.log('totalAmount', totalAmount)
 
+    const [userID, setUserID] = useState('')
     const [currentTableType, setCurrentTableType] = useState('')
-    const [currentTime, setCurrentTime] = useState('')
+    const [currentTime, setCurrentTime] = useState('')//pass argument new Date() for live interval
     const [date, setDate] = useState('')
     const [itemCode, setItemCode] = useState('');
     const [rate, setRate] = useState('');
@@ -23,20 +31,32 @@ const OrderForm = () => {
     const [deptNo, setDeptNo] = useState('')
     const [qty, setQty] = useState('')
     const [tableNo, setTableNo] = useState('')
-    const uuidValue = uuidv4();
+    console.log('found userid', userID)
+    const uuidValue = uuid.v4();
     const rowId = parseInt(uuidValue.substring(0, 4), 16);
 
+    console.log('id', rowId)
     //console.log(tableNo)
-
+    let amount = parseInt(rate) * parseInt(qty)
+    let bookingDate=new Date(date)
+    console.log('con_date',bookingDate)
     // console.log(orders)
     const dispatch = useDispatch()
     useEffect(() => {
         firstInputRef.current.focus();
         dispatch(fetchOrders())
         fetchDate()
-        getCurrentTime()
+        getUserID()
+      getCurrentTime()
         fetchTable(tableNo)
-    }, [dispatch,tableNo])
+    //     const interval = setInterval(() => {
+    //         setCurrentTime(new Date());
+    //       }, 1000); 
+  
+    //    return () => {
+    //     clearInterval(interval); 
+    //   };
+    }, [dispatch, tableNo])
 
 
     const handleSearch = (text) => {
@@ -62,11 +82,11 @@ const OrderForm = () => {
             itemName === ''
         ) {
             alert('All fields are required');
-            return;
+            //return;
         }
         else {
             data = {
-                rowId,tableNo, itemCode, rate, qty, itemName
+                rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType,amount
             }
             dispatch(addStudent(data));
             setItemCode('')
@@ -74,28 +94,7 @@ const OrderForm = () => {
             setItemName('')
             setQty('')
             setRate('')
-            setTableNo('')
-
-            // console.log(data)
-            // try {
-            //     const response = await axios.post(
-            //         'https://resturant-server-mssql.vercel.app/api/order', data
-            //     );
-            //     alert("Your order is submitted")
-
-            //     //console.log('Form data sent:', response.data);
-            //     setItemCode('')
-            //     setDeptNo('')
-            //     setItemName('')
-            //     setQty('')
-            //     setRate('')
-            //     setTableNo('')
-
-            //     // You can handle the response here as needed.
-            // } catch (error) {
-            //     console.error('Error sending form data:', error);
-            // }
-
+            secondInputRef.current.focus();
         }
     };
 
@@ -108,11 +107,9 @@ const OrderForm = () => {
             dispatch(resetStudents());
             AsyncStorage.removeItem('students');
             alert("Your order is submitted")
+            setTableNo('')
+            setCurrentTableType('')
             firstInputRef.current.focus();
-            //console.log('Form data sent:', response.data);
-
-
-            // You can handle the response here as needed.
         } catch (error) {
             console.error('Error sending form data:', error);
         }
@@ -125,6 +122,7 @@ const OrderForm = () => {
             let result = await response.json()
             // console.log(result[0].TDate)
             const dateString = result[0].TDate
+            
             const date = new Date(dateString)
             const day = date.getUTCDate()
             const month = date.getUTCMonth() + 1
@@ -149,28 +147,50 @@ const OrderForm = () => {
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
         const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds; const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
         setCurrentTime(currentTime)
+
+       
+      
+          
     }
 
     const fetchTable = async (tableNo) => {
         let response = await fetch('https://resturant-server-mssql.vercel.app/api/table')
         let tables = await response.json()
-        console.log(tables)
-        const foundTable=tables.filter((e)=>e.TableNo===parseInt(tableNo))
-        console.log(foundTable[0]?.TypeT)       
-        if (foundTable) {         
-            setCurrentTableType(foundTable[0]?.TypeT)
-        } 
-      
+        console.log(tables)    
+        const foundTable=tables.find(item=>item.TableNo===parseInt(tableNo))
+        if(foundTable){
+            const tableType=foundTable.TypeT
+            console.log("found table type",tableType) 
+            setCurrentTableType(tableType)
+        }
+    }
+
+    const getUserID = async () => {
+        try {
+            let response = await fetch('https://resturant-server-mssql.vercel.app/api/user')
+            let result = await response.json()
+            console.log('userid', result)
+            const foundUserID = result.filter((e) => e.UserID === user_ID)
+            if (foundUserID) {
+                // setUserID(foundUserID[0]?.UserID)
+                setUserID('bhanu')
+            }
+
+        } catch (error) {
+            console.error('Error in fetching UserID:', error);
+        }
     }
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
+            {/* <Text style={styles.date}>UserID:{userID}</Text> */}
             <View style={styles.header}>
                 <Text style={styles.date}>{date}</Text>
                 <Logo style={styles.logo} />
                 <View>
-                <Text style={styles.time}>{currentTime}</Text>
-                <Text style={styles.tableType}>{currentTableType}</Text>
+                    <Text style={styles.time}>{currentTime}</Text>
+                    {/* currentTime.toLocaleTimeString() */}
+                    <Text style={styles.tableType}>{currentTableType}</Text>
                 </View>
             </View>
             <View style={styles.formRow}>
@@ -185,6 +205,7 @@ const OrderForm = () => {
             <View style={styles.formRow}>
                 <Text style={styles.label}>Item Code</Text>
                 <TextInput style={styles.input}
+                    ref={secondInputRef}
                     placeholder="Item Code"
                     value={itemCode}
                     onChangeText={handleSearch}
@@ -236,9 +257,6 @@ const OrderForm = () => {
                     <Button title="Print" color='#003c75' />
                 </View>
             </View>
-            {/* <OrderList/> */}
-            {/* <OrderGridTable/> */}
-            {/* <RestaurantOrderGrid /> */}
         </ScrollView>
 
     );
@@ -247,7 +265,7 @@ const OrderForm = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        padding: 10,
         backgroundColor: '#eef4fc',
     },
     formRow: {
@@ -304,8 +322,8 @@ const styles = StyleSheet.create({
         marginTop: 88,
         //marginLeft: 16,
     },
-    tableType:{
-        flex:1,
+    tableType: {
+        flex: 1,
         fontSize: 16,
         color: 'red',
         fontWeight: 500,
@@ -316,13 +334,3 @@ const styles = StyleSheet.create({
 });
 
 export default OrderForm
-
-//label color:#0c3761
-//text box border color:#4c5156
-//textbox background:#fffefe
-//form background color:#eef4fc
-//font color:#5b5f61
-//button background :#003c75
-//button font color:#d9e9f9
-//heading color:#888f94
-//heading label color:#04070b

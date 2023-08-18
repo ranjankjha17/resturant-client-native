@@ -1,12 +1,8 @@
-// studentSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-//import AsyncStorage from '@react-native-community/async-storage';
-//import {AsyncStorage} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 const initialState = {
-  students: [],
+  students: [],  
 };
 
 const studentSlice = createSlice({
@@ -14,10 +10,18 @@ const studentSlice = createSlice({
   initialState,
   reducers: {
     addStudent: (state, action) => {
+      // const newOrder=action.payload
+      // const rate=parseInt(newOrder.rate)
+      // const qty=parseInt(newOrder.qty)
+      // state.totalAmount+=rate
       state.students.push(action.payload);
       AsyncStorage.setItem('students', JSON.stringify(state.students));
     },
     deleteStudent: (state, action) => {
+      // const newOrder=action.payload
+      // const rate=parseInt(newOrder.rate)
+      // const qty=parseInt(newOrder.qty)
+      // state.totalAmount-=rate
       state.students = state.students.filter(student => student.rowId !== action.payload);
       AsyncStorage.setItem('students', JSON.stringify(state.students));
     },
@@ -27,6 +31,7 @@ const studentSlice = createSlice({
     resetStudents: state => {
       state.students = [];
     },
+
   },
 });
 

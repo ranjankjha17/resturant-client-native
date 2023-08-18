@@ -6,6 +6,7 @@ import { logout } from '../reducers/login';
 import OrderForm  from './OrderForm';
 import OrderList from './OrderList';
 import RestaurantOrderGrid from './RestaurantOrderGrid';
+import ListExample from './ListExample';
 
 const DashboardScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ const DashboardScreen = ({ navigation }) => {
     dispatch(logout()); 
     try {
       
-      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('loginToken');
     } catch (error) {
       console.log('Error clearing token:', error);
     }
@@ -24,21 +25,23 @@ const DashboardScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <View style={{flexDirection:"row",justifyContent:"flex-end",paddingRight:20,paddingTop:10}}>
       <Button title="Logout" onPress={handleLogout} />
-      <View >
+      </View>
        <OrderForm/>
-        <OrderList/>
+         <OrderList/> 
        <RestaurantOrderGrid />    
-    </View>
+      
+   {/* <ListExample/> */}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
 });
 

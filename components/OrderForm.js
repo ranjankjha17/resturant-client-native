@@ -16,9 +16,9 @@ const OrderForm = () => {
     const orders = useSelector(state => state.orders)
     const students = useSelector(state => state.tempOrder.students);
     const user_ID = useSelector(state => state.auth.userID)
-   //const userID="bhanu"
+    //const userID="bhanu"
     console.log('user_ID', user_ID)
-   // const totalAmount = useSelector(state => state.tempOrder.totalAmount)
+    // const totalAmount = useSelector(state => state.tempOrder.totalAmount)
     //console.log('totalAmount', totalAmount)
 
     const [userID, setUserID] = useState('')
@@ -38,8 +38,8 @@ const OrderForm = () => {
     console.log('id', rowId)
     //console.log(tableNo)
     let amount = parseInt(rate) * parseInt(qty)
-    let bookingDate=new Date(date)
-    console.log('con_date',bookingDate)
+    let bookingDate = date
+    console.log('booking_date', bookingDate)
     // console.log(orders)
     const dispatch = useDispatch()
     useEffect(() => {
@@ -47,15 +47,15 @@ const OrderForm = () => {
         dispatch(fetchOrders())
         fetchDate()
         getUserID()
-      getCurrentTime()
+        getCurrentTime()
         fetchTable(tableNo)
-    //     const interval = setInterval(() => {
-    //         setCurrentTime(new Date());
-    //       }, 1000); 
-  
-    //    return () => {
-    //     clearInterval(interval); 
-    //   };
+        //     const interval = setInterval(() => {
+        //         setCurrentTime(new Date());
+        //       }, 1000); 
+
+        //    return () => {
+        //     clearInterval(interval); 
+        //   };
     }, [dispatch, tableNo])
 
 
@@ -86,7 +86,7 @@ const OrderForm = () => {
         }
         else {
             data = {
-                rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType,amount
+                rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType, amount
             }
             dispatch(addStudent(data));
             setItemCode('')
@@ -122,7 +122,7 @@ const OrderForm = () => {
             let result = await response.json()
             // console.log(result[0].TDate)
             const dateString = result[0].TDate
-            
+
             const date = new Date(dateString)
             const day = date.getUTCDate()
             const month = date.getUTCMonth() + 1
@@ -148,19 +148,19 @@ const OrderForm = () => {
         const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds; const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
         setCurrentTime(currentTime)
 
-       
-      
-          
+
+
+
     }
 
     const fetchTable = async (tableNo) => {
         let response = await fetch('https://resturant-server-mssql.vercel.app/api/table')
         let tables = await response.json()
-        console.log(tables)    
-        const foundTable=tables.find(item=>item.TableNo===parseInt(tableNo))
-        if(foundTable){
-            const tableType=foundTable.TypeT
-            console.log("found table type",tableType) 
+        console.log(tables)
+        const foundTable = tables.find(item => item.TableNo === parseInt(tableNo))
+        if (foundTable) {
+            const tableType = foundTable.TypeT
+            console.log("found table type", tableType)
             setCurrentTableType(tableType)
         }
     }
@@ -173,7 +173,8 @@ const OrderForm = () => {
             const foundUserID = result.filter((e) => e.UserID === user_ID)
             if (foundUserID) {
                 // setUserID(foundUserID[0]?.UserID)
-                setUserID('bhanu')
+                console.log("foundUserID",foundUserID)
+                setUserID(user_ID)
             }
 
         } catch (error) {

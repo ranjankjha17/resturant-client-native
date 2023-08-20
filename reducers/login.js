@@ -64,7 +64,7 @@ const authSlice = createSlice({
     login: (state,action) => {
       state.isLoggedIn = true;
       state.userID = action.payload;
-     // AsyncStorage.setItem('login', JSON.stringify(state.userID));
+    //  AsyncStorage.setItem('loginUserID', JSON.stringify(state.userID));
       
     },
     logout: (state) => {

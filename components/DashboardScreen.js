@@ -20,7 +20,7 @@ const DashboardScreen = ({ navigation }) => {
       console.log('Error clearing token:', error);
     }
 
-    navigation.navigate('Login'); 
+    navigation.navigate('LoginScreen'); 
   };
 
   return (

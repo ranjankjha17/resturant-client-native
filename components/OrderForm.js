@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import uuid from 'react-native-uuid';
 
 const OrderForm = () => {
+   
     const firstInputRef = useRef(null);
     const secondInputRef = useRef(null);
     let data;
@@ -84,7 +85,7 @@ const OrderForm = () => {
             alert('All fields are required');
             //return;
         }
-        else {
+        else {           
             data = {
                 rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType, amount
             }
@@ -122,7 +123,6 @@ const OrderForm = () => {
             let result = await response.json()
             // console.log(result[0].TDate)
             const dateString = result[0].TDate
-
             const date = new Date(dateString)
             const day = date.getUTCDate()
             const month = date.getUTCMonth() + 1
@@ -147,10 +147,6 @@ const OrderForm = () => {
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
         const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds; const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
         setCurrentTime(currentTime)
-
-
-
-
     }
 
     const fetchTable = async (tableNo) => {
@@ -167,19 +163,26 @@ const OrderForm = () => {
 
     const getUserID = async () => {
         try {
-            let response = await fetch('https://resturant-server-mssql.vercel.app/api/user')
-            let result = await response.json()
-            console.log('userid', result)
-            const foundUserID = result.filter((e) => e.UserID === user_ID)
-            if (foundUserID) {
-                // setUserID(foundUserID[0]?.UserID)
-                console.log("foundUserID",foundUserID)
-                setUserID(user_ID)
-            }
+            const user=await AsyncStorage.getItem('loginUserID')
+            console.log("userid async",user)
+            
+            // let response = await fetch('https://resturant-server-mssql.vercel.app/api/user')
+            // let result = await response.json()
+            // console.log('userid', result)
+            // const foundUserID = result.filter((e) => e.UserID === user_ID)
+            // if (foundUserID) {
+            //     // setUserID(foundUserID[0]?.UserID)
+            //     console.log("foundUserID",foundUserID)
+            //     setUserID(user_ID)
+            // }
+
+            setUserID(user_ID ? user_ID:user)
 
         } catch (error) {
             console.error('Error in fetching UserID:', error);
         }
+
+       
     }
 
     return (

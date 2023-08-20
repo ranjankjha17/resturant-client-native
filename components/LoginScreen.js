@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,7 +8,6 @@ import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
     const navigation = useNavigation();
-
     const [userID, setUSerID] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
@@ -17,49 +16,37 @@ const LoginScreen = () => {
     const handleLogin = async () => {
         if (
             userID === '' ||
-            password === '' 
-           
+            password === ''
+
         ) {
             alert('UserID and Password are required');
-            
-        }else{      
-        console.log('userID:', userID);
-        console.log('Password:', password);
-        let data = { userID, password }
-        let response = await createLogin(data)
-        console.log(response.token)
-        const token = response.token
-        dispatch(login(userID));
-        try {
-            await AsyncStorage.setItem('loginToken', token); 
-        } catch (error) {
-            console.log('Error storing token:', error);
-        }
-        if (token) {           
-            navigation.navigate('DashboardScreen');
-        }
-    };
 
-}
+        } else {
+            console.log('userID:', userID);
+            console.log('Password:', password);
+            let data = { userID, password }
+            let response = await createLogin(data)
+            console.log(response.token)
+            const token = response.token
+            await AsyncStorage.setItem('loginToken', token);
+            AsyncStorage.setItem('loginUserID', userID);
+            dispatch(login(userID));
+        };
+    }
+  
     useEffect(() => {
-        let isLoggedIn = checkLoggedInStatus()
+        checkLoggedInStatus()
         if (isLoggedIn) {
             navigation.navigate('DashboardScreen');
-        }else{
-            navigation.navigate('LoginScreen')
         }
-    }, [dispatch])
+    }, [dispatch,isLoggedIn])
     const checkLoggedInStatus = async () => {
         const storedToken = await AsyncStorage.getItem('loginToken');
         console.log(storedToken)
         if (storedToken) {
-            dispatch(login());
+            dispatch(login(userID));
         }
     };
-
-    if (!isLoggedIn) {
-        checkLoggedInStatus();
-    }
 
     return (
         <View style={styles.container}>
@@ -78,9 +65,9 @@ const LoginScreen = () => {
                 onChangeText={setPassword}
             />
             <View style={styles.button_area}>
-            <Button title="Login"  onPress={handleLogin} />
+                <Button title="Login" onPress={handleLogin} />
             </View>
-          
+
         </View>
     );
 };
@@ -112,7 +99,7 @@ const styles = StyleSheet.create({
     //     paddingHorizontal: 20,
     //     paddingVertical: 10,
     //     color: "#003c75",
-      
+
     // },
 });
 

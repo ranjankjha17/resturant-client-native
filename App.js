@@ -14,7 +14,7 @@ export default function App() {
       <Provider store={store}>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Login">
-            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} />
             <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
           </Stack.Navigator>
         </NavigationContainer>

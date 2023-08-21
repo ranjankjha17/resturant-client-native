@@ -1,4 +1,3 @@
-// StudentList.js
 import React, { useEffect } from 'react';
 import { View, Text, Button, FlatList, ScrollView } from 'react-native';
 import { StyleSheet } from 'react-native';
@@ -25,29 +24,10 @@ function OrderList({ data }) {
 
     loadStoredStudents();
   }, []);
-
-  const handleAddStudent = () => {
-    // const newStudent = { name: 'Eve4', age: 19, grade: 'B+' };
-    // dispatch(addStudent(newStudent));
-  };
-
   const handleDeleteStudent = rowId => {
     dispatch(deleteStudent(rowId));
   };
-  // const renderItem = ({ item }) => (
-  //   <View style={styles.formRow}>
-  //      <Text style={styles.grid_label}>{item?.rowId}</Text>
-  //     <Text style={styles.grid_label}>{item?.tableNo}</Text>
-  //     <Text style={styles.grid_label}>{item?.itemCode}</Text>
-  //     <Text style={styles.grid_label}>{item?.qty}</Text>
-  //     <Text style={styles.grid_label}>{item?.rate}</Text>
-  //     <Text style={styles.grid_label}>{item?.itemName}</Text>
-  //     <Button
-  //       title="Delete"
-  //       onPress={() => handleDeleteStudent(item?.rowId)}
-  //     />
-  //   </View>
-  // );
+ 
   return (
     <View style={styles.container2}>
       <Text style={styles.heading}>Orders List</Text>
@@ -56,8 +36,8 @@ function OrderList({ data }) {
         <Text style={styles.grid_heading}>TableNo</Text>
         <Text style={styles.grid_heading}>ItemCode</Text>
         <Text style={styles.grid_heading}>QTY</Text>
-        <Text style={styles.grid_heading}>Rate</Text>
         <Text style={styles.grid_heading}>ItemName</Text>
+        <Text style={styles.grid_heading}>Rate</Text>
         <Text style={styles.grid_heading}>Action</Text>
       </View>
       <ScrollView style={styles.container}>
@@ -67,72 +47,21 @@ function OrderList({ data }) {
           <Text style={styles.grid_label}>{student?.tableNo}</Text>
           <Text style={styles.grid_label}> {student?.itemCode}</Text>
           <Text style={styles.grid_label}>{student?.qty}</Text>
-          <Text style={styles.grid_label}> {student?.rate}</Text>
           <Text style={styles.grid_label}> {student?.itemName}</Text>
-          <Button
+          <Text style={styles.grid_label}> {student?.rate}</Text>
+          {/* <Button
             title="Delete"
             onPress={() => handleDeleteStudent(student?.rowId)}
-          />
+          /> */}
+          <Text style={styles.button_delete} onPress={() => handleDeleteStudent(student?.rowId)}>Delete</Text>
         </ScrollView>
       ))}
     </ScrollView>
-</View>
-    // <ScrollView contentContainerStyle={styles.container}>
-    //   <View>
-    //   <Text style={styles.heading}>Orders List</Text>
-    //   </View>
-    //   <View style={styles.formRow}>
-    //   <Text style={styles.grid_heading}>RowID</Text>
-    //     <Text style={styles.grid_heading}>TableNo</Text>
-    //     <Text style={styles.grid_heading}>ItemCode</Text>
-    //     <Text style={styles.grid_heading}>QTY</Text>
-    //     <Text style={styles.grid_heading}>Rate</Text>
-    //     <Text style={styles.grid_heading}>ItemName</Text>
-    //     <Text style={styles.grid_heading}>Action</Text>
-    //   </View>
-    //   <FlatList
-    //   LisHeaderComponent={
-    //     <View style={{ flex: 1 }}>
-    //       <Text>Header content</Text>
-    //     </View>
-    //   }
-    //     data={students}
-    //     renderItem={renderItem}
-    //     keyExtractor={(item) => item.rowId.toString()}
-    //     ListFooterComponent={
-    //       <View style={{ flex: 1 }}>
-    //         {/* <Text>Footer content</Text> */}
-    //       </View>
-    //     }
-    //   />
-    // </ScrollView>
+</View> 
   );
 }
 
 export default OrderList;
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 16,
-//    //maxHeight:200,
-//   },
-//   heading: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     marginBottom: 16,
-//   },
-//   formRow: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     marginBottom: 8,
-//   },
-//   grid_heading: {
-//     fontWeight: 'bold',
-//   },
-//   grid_label: {
-//     flex: 1,
-//   },
-// });
 
 const styles = StyleSheet.create({
   container: {
@@ -141,9 +70,7 @@ const styles = StyleSheet.create({
   
    //padding: 10,
   },
-  container2: {
-    //flex:1,
-    // height:300,
+  container2: { 
     padding: 10,
    },
   formRow: {
@@ -171,4 +98,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 16,
   },
+  button_delete:{
+    flex: 1,
+    fontSize: 12,
+    color: '#0c3761',
+    fontWeight: 500,
+  }
 });

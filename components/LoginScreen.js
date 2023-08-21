@@ -2,16 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login } from '../reducers/login';
+import { login, loginFailure } from '../reducers/login';
 import { createLogin } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
+import { useMemo } from 'react';
 
 const LoginScreen = () => {
+    const dispatch = useDispatch();
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+    const loginError = useSelector(state => state.auth.error)
+   // console.log(loginError)
     const navigation = useNavigation();
     const [userID, setUSerID] = useState('');
     const [password, setPassword] = useState('');
-    const dispatch = useDispatch();
-    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleLogin = async () => {
         if (
@@ -19,27 +23,32 @@ const LoginScreen = () => {
             password === ''
 
         ) {
-            alert('UserID and Password are required');
+            setErrorMessage('UserID and Password are required');
 
         } else {
+            setErrorMessage('');
             console.log('userID:', userID);
             console.log('Password:', password);
             let data = { userID, password }
-            let response = await createLogin(data)
+            let response = await createLogin(data,dispatch)
             console.log(response.token)
             const token = response.token
+
             await AsyncStorage.setItem('loginToken', token);
             AsyncStorage.setItem('loginUserID', userID);
             dispatch(login(userID));
+            setUSerID('')
+            setPassword('')
+            setErrorMessage('');
+
         };
     }
-  
     useEffect(() => {
         checkLoggedInStatus()
         if (isLoggedIn) {
             navigation.navigate('DashboardScreen');
         }
-    }, [dispatch,isLoggedIn])
+    }, [dispatch, isLoggedIn])
     const checkLoggedInStatus = async () => {
         const storedToken = await AsyncStorage.getItem('loginToken');
         console.log(storedToken)
@@ -48,7 +57,8 @@ const LoginScreen = () => {
         }
     };
 
-    return (
+  
+        const memoizedLogin = useMemo(() => (
         <View style={styles.container}>
             <Text style={styles.heading}>Login</Text>
             <TextInput
@@ -64,12 +74,18 @@ const LoginScreen = () => {
                 value={password}
                 onChangeText={setPassword}
             />
-            <View style={styles.button_area}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+            {loginError && <Text style={styles.errorText}>{loginError}</Text>}
+            {/* <View>
                 <Button title="Login" onPress={handleLogin} />
+            </View> */}
+            <View style={styles.button_area}>
+                <Text onPress={handleLogin} style={styles.label}>Login</Text>
             </View>
-
         </View>
-    );
+     ), [userID, password, loginError,errorMessage]); 
+
+     return memoizedLogin;
 };
 
 const styles = StyleSheet.create({
@@ -77,30 +93,43 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        // backgroundColor:'#003c75'
+        backgroundColor: '#eef4fc',
     },
     heading: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-        // color:"#ffffff"
+        color: '#0c3761',
+        fontWeight: 500,
     },
     input: {
         width: '80%',
         height: 40,
-        borderColor: 'gray',
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 10,
+        borderColor: '#4c5156',
+        backgroundColor: '#fffefe',
+        color: '#5b5f61',
     },
-    // button_area: {
-    //     backgroundColor: '#fff',
-    //     borderRadius: 5,
-    //     paddingHorizontal: 20,
-    //     paddingVertical: 10,
-    //     color: "#003c75",
+    button_area: {
+        backgroundColor: '#003c75',
+        borderRadius: 5,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
 
-    // },
+    },
+    label: {
+        fontSize: 16,
+        color: '#d9e9f9',
+        fontWeight: 500
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        marginBottom: 10,
+        fontWeight: 500
+    },
 });
 
 export default LoginScreen;

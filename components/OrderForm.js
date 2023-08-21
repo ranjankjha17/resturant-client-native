@@ -8,6 +8,7 @@ import { addStudent, resetStudents } from '../reducers/temp_order';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { v4 as uuidv4 } from 'uuid';
 import uuid from 'react-native-uuid';
+import { useMemo } from 'react';
 
 const OrderForm = () => {
    
@@ -164,18 +165,7 @@ const OrderForm = () => {
     const getUserID = async () => {
         try {
             const user=await AsyncStorage.getItem('loginUserID')
-            console.log("userid async",user)
-            
-            // let response = await fetch('https://resturant-server-mssql.vercel.app/api/user')
-            // let result = await response.json()
-            // console.log('userid', result)
-            // const foundUserID = result.filter((e) => e.UserID === user_ID)
-            // if (foundUserID) {
-            //     // setUserID(foundUserID[0]?.UserID)
-            //     console.log("foundUserID",foundUserID)
-            //     setUserID(user_ID)
-            // }
-
+            console.log("userid async",user)        
             setUserID(user_ID ? user_ID:user)
 
         } catch (error) {
@@ -185,7 +175,7 @@ const OrderForm = () => {
        
     }
 
-    return (
+    const memoizedOrderForm = useMemo(() => (
         <ScrollView contentContainerStyle={styles.container}>
             {/* <Text style={styles.date}>UserID:{userID}</Text> */}
             <View style={styles.header}>
@@ -238,7 +228,6 @@ const OrderForm = () => {
                     placeholder="Dept No"
                     value={deptNo}
                     editable={false}
-
                 />
             </View>
             <View style={styles.formRow}>
@@ -247,23 +236,25 @@ const OrderForm = () => {
                     placeholder="Item Name"
                     value={itemName}
                     editable={false}
-
                 />
             </View>
             <View style={styles.buttonContainer}>
                 <View style={styles.button_area}>
-                    <Button title="ADD" color='#003c75' onPress={handleSubmit} />
+                    <Text style={styles.button} onPress={handleSubmit}>ADD</Text>
                 </View>
                 <View style={styles.button_area}>
-                    <Button title="Kot" color='#003c75' onPress={handleSaveData} />
+                    <Text style={styles.button} onPress={handleSaveData}>KOT</Text>
                 </View>
                 <View style={styles.button_area}>
-                    <Button title="Print" color='#003c75' />
+                    <Text style={styles.button}>PRINT</Text>
                 </View>
             </View>
         </ScrollView>
 
-    );
+),  [tableNo, itemCode, qty, rate, deptNo, itemName, handleSearch, handleSubmit, handleSaveData]); 
+
+return memoizedOrderForm;
+
 };
 
 const styles = StyleSheet.create({
@@ -308,8 +299,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     logo: {
-        flex: 2,
-        //marginLeft:48,
+        flex: 2,        
     },
     date: {
         flex: 1,
@@ -324,14 +314,19 @@ const styles = StyleSheet.create({
         color: 'red',
         fontWeight: 500,
         marginTop: 88,
-        //marginLeft: 16,
     },
     tableType: {
         flex: 1,
         fontSize: 16,
         color: 'red',
         fontWeight: 500,
-        // marginTop: 88,
+    },
+    button:{
+        fontSize: 16,
+        color: '#d9e9f9',
+        fontWeight: 500,
+        paddingTop:3
+
     }
 
 

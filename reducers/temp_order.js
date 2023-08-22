@@ -9,19 +9,11 @@ const studentSlice = createSlice({
   name: 'students',
   initialState,
   reducers: {
-    addStudent: (state, action) => {
-      // const newOrder=action.payload
-      // const rate=parseInt(newOrder.rate)
-      // const qty=parseInt(newOrder.qty)
-      // state.totalAmount+=rate
+    addStudent: (state, action) => {  
       state.students.push(action.payload);
       AsyncStorage.setItem('students', JSON.stringify(state.students));
     },
-    deleteStudent: (state, action) => {
-      // const newOrder=action.payload
-      // const rate=parseInt(newOrder.rate)
-      // const qty=parseInt(newOrder.qty)
-      // state.totalAmount-=rate
+    deleteStudent: (state, action) => {     
       state.students = state.students.filter(student => student.rowId !== action.payload);
       AsyncStorage.setItem('students', JSON.stringify(state.students));
     },

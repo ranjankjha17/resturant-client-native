@@ -7,21 +7,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function OrderList({ data }) {
   const students = useSelector(state => state.tempOrder.students);
-  console.log('students',students)
+ // console.log('students',students)
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    async function loadStoredStudents() {
-      try {
-        const studentsData = await AsyncStorage.getItem('students');
-        if (studentsData) {
-          dispatch(loadStudents(JSON.parse(studentsData)));
-        }
-      } catch (error) {
-        console.error('Error loading students:', error);
+  async function loadStoredStudents() {
+    try {
+      const studentsData = await AsyncStorage.getItem('students');
+      if (studentsData) {
+        dispatch(loadStudents(JSON.parse(studentsData)));
       }
+    } catch (error) {
+      console.log( error.message);
     }
-
+  }
+  useEffect(() => {   
     loadStoredStudents();
   }, []);
   const handleDeleteStudent = rowId => {

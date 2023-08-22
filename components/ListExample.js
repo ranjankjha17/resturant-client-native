@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchOrders } from '../reducers/order';
+import { fetchItems } from '../reducers/order';
 
 const INITIAL_ROWS_TO_RENDER = 5; // Adjust as needed
 const ADDITIONAL_ROWS_TO_LOAD = 3; // Adjust as needed
@@ -12,7 +12,7 @@ const ListExample = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchOrders());
+    dispatch(fetchItems());
   }, [dispatch]);
 
   const handleSearch = (text) => {

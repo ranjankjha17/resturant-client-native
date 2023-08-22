@@ -11,7 +11,6 @@ const LoginScreen = () => {
     const dispatch = useDispatch();
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
     const loginError = useSelector(state => state.auth.error)
-   // console.log(loginError)
     const navigation = useNavigation();
     const [userID, setUSerID] = useState('');
     const [password, setPassword] = useState('');
@@ -27,19 +26,20 @@ const LoginScreen = () => {
 
         } else {
             setErrorMessage('');
-            console.log('userID:', userID);
-            console.log('Password:', password);
+            //console.log('userID:', userID);
+            //console.log('Password:', password);
             let data = { userID, password }
-            let response = await createLogin(data,dispatch)
-            console.log(response.token)
-            const token = response.token
+            let response = await createLogin(data, dispatch)
+            if (response) {
+                const token = response.token
+                await AsyncStorage.setItem('loginToken', token);
+                AsyncStorage.setItem('loginUserID', userID);
+                dispatch(login(userID));
+                setUSerID('')
+                setPassword('')
+                setErrorMessage('');
+            }
 
-            await AsyncStorage.setItem('loginToken', token);
-            AsyncStorage.setItem('loginUserID', userID);
-            dispatch(login(userID));
-            setUSerID('')
-            setPassword('')
-            setErrorMessage('');
 
         };
     }
@@ -51,14 +51,14 @@ const LoginScreen = () => {
     }, [dispatch, isLoggedIn])
     const checkLoggedInStatus = async () => {
         const storedToken = await AsyncStorage.getItem('loginToken');
-        console.log(storedToken)
+      //  console.log(storedToken)
         if (storedToken) {
             dispatch(login(userID));
         }
     };
 
-  
-        const memoizedLogin = useMemo(() => (
+
+    const memoizedLogin = useMemo(() => (
         <View style={styles.container}>
             <Text style={styles.heading}>Login</Text>
             <TextInput
@@ -74,18 +74,15 @@ const LoginScreen = () => {
                 value={password}
                 onChangeText={setPassword}
             />
-            <Text style={styles.errorText}>{errorMessage}</Text>
-            {loginError && <Text style={styles.errorText}>{loginError}</Text>}
-            {/* <View>
-                <Button title="Login" onPress={handleLogin} />
-            </View> */}
+            {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+            {loginError && <Text style={styles.errorText}>{loginError}</Text>}            
             <View style={styles.button_area}>
                 <Text onPress={handleLogin} style={styles.label}>Login</Text>
             </View>
         </View>
-     ), [userID, password, loginError,errorMessage]); 
+    ), [userID, password, loginError, errorMessage]);
 
-     return memoizedLogin;
+    return memoizedLogin;
 };
 
 const styles = StyleSheet.create({

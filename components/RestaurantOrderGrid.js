@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchOrders } from '../reducers/order';
+import { fetchItems } from '../reducers/order';
 
 const RestaurantOrderGrid = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -9,7 +9,7 @@ const RestaurantOrderGrid = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchOrders());
+    dispatch(fetchItems());
   }, [dispatch]);
 
   const handleSearch = (text) => {
@@ -67,7 +67,7 @@ const RestaurantOrderGrid = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 200,
+    //height: 200,
     padding: 10,
   },
   scrollView: {

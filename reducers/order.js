@@ -20,14 +20,14 @@ export const { setOrders,addOrder } = orderSlice.actions
 export default orderSlice.reducer
 
 
-export const fetchOrders = () => async (dispatch) => {
+export const fetchItems = () => async (dispatch) => {
     try {
         const orders = await orderService.getOrders()
         //console.log(orders)
         dispatch(setOrders(orders))
 
     } catch (error) {
-        console.error("Error in fetching orders", error)
+        console.log("Error in fetching orders", error.message)
     }
 }
 
@@ -37,6 +37,6 @@ export const addNewOrder = (orderData) => async (dispatch) => {
       //console.log(newOrder)
       dispatch(addOrder(newOrder));
     } catch (error) {
-      console.error("Error creating order:", error);
+      console.log("Error creating order:", error.message);
     }
   };

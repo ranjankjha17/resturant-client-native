@@ -7,8 +7,9 @@ export const createLogin = async (userData,dispatch) => {
     try {
         const response = await axios.post(`${BASE_URL}/api/login`,userData)
         return response.data
-    } catch (error) {
+    } catch (e) {
         dispatch(loginFailure('UserID and Password did not match'))
-        throw new Error('Error getting users login')
+        // throw new Error('Error getting users login')
+        console.log(e.message)
     }
 }

@@ -1,28 +1,25 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Button } from 'react-native';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchOrders } from '../reducers/order';
+import { fetchItems } from '../reducers/order';
 import Logo from './Logo';
 import { addStudent, resetStudents } from '../reducers/temp_order';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { v4 as uuidv4 } from 'uuid';
 import uuid from 'react-native-uuid';
 import { useMemo } from 'react';
+import { createOrder, getDate, getTable } from '../services/orderService';
 
 const OrderForm = () => {
-   
     const firstInputRef = useRef(null);
     const secondInputRef = useRef(null);
     let data;
     const orders = useSelector(state => state.orders)
     const students = useSelector(state => state.tempOrder.students);
-    const user_ID = useSelector(state => state.auth.userID)
-    //const userID="bhanu"
-    console.log('user_ID', user_ID)
-    // const totalAmount = useSelector(state => state.tempOrder.totalAmount)
-    //console.log('totalAmount', totalAmount)
-
+    const user_ID = useSelector(state => state.auth.userID)  
+    const dispatch = useDispatch()
+    const loginError = useSelector(state => state.auth.error)
+    let error=loginError
+console.log('loginerror',loginError)
     const [userID, setUserID] = useState('')
     const [currentTableType, setCurrentTableType] = useState('')
     const [currentTime, setCurrentTime] = useState('')//pass argument new Date() for live interval
@@ -33,20 +30,14 @@ const OrderForm = () => {
     const [deptNo, setDeptNo] = useState('')
     const [qty, setQty] = useState('')
     const [tableNo, setTableNo] = useState('')
-    console.log('found userid', userID)
     const uuidValue = uuid.v4();
     const rowId = parseInt(uuidValue.substring(0, 4), 16);
-
-    console.log('id', rowId)
-    //console.log(tableNo)
     let amount = parseInt(rate) * parseInt(qty)
     let bookingDate = date
-    console.log('booking_date', bookingDate)
-    // console.log(orders)
-    const dispatch = useDispatch()
+  
     useEffect(() => {
         firstInputRef.current.focus();
-        dispatch(fetchOrders())
+        dispatch(fetchItems())
         fetchDate()
         getUserID()
         getCurrentTime()
@@ -59,7 +50,6 @@ const OrderForm = () => {
         //     clearInterval(interval); 
         //   };
     }, [dispatch, tableNo])
-
 
     const handleSearch = (text) => {
         setItemCode(text);
@@ -83,10 +73,9 @@ const OrderForm = () => {
             deptNo === '' ||
             itemName === ''
         ) {
-            alert('All fields are required');
-            //return;
+            alert('All fields are required');           
         }
-        else {           
+        else {
             data = {
                 rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType, amount
             }
@@ -96,33 +85,26 @@ const OrderForm = () => {
             setItemName('')
             setQty('')
             setRate('')
+            error=''
             secondInputRef.current.focus();
         }
     };
 
-    const handleSaveData = async () => {
-        try {
-            const response = await axios.post(
-                'https://resturant-server-mssql.vercel.app/api/order', students
-            );
-
+    const handleSaveData = async () => {    
+        const response = await createOrder(students,dispatch)
+        if (response) {
             dispatch(resetStudents());
             AsyncStorage.removeItem('students');
             alert("Your order is submitted")
             setTableNo('')
             setCurrentTableType('')
             firstInputRef.current.focus();
-        } catch (error) {
-            console.error('Error sending form data:', error);
         }
     }
 
-    const fetchDate = async () => {
-        const timeoutDuration = 10000;
-        try {
-            let response = await fetch('https://resturant-server-mssql.vercel.app/api/date', { timeout: timeoutDuration })
-            let result = await response.json()
-            // console.log(result[0].TDate)
+    const fetchDate = async () => {         
+            const result=await getDate()
+            if(result){         
             const dateString = result[0].TDate
             const date = new Date(dateString)
             const day = date.getUTCDate()
@@ -131,12 +113,8 @@ const OrderForm = () => {
             const formattedDay = day < 10 ? `0${day}` : day;
             const formattedMonth = month < 10 ? `0${month}` : month;
             const formattedDateStr = `${formattedDay}-${formattedMonth}-${year}`;
-            console.log(formattedDateStr)
             setDate(formattedDateStr)
-        } catch (error) {
-            console.error('Network request failed:', error);
-
-        }
+            }       
     }
 
     const getCurrentTime = () => {
@@ -150,29 +128,18 @@ const OrderForm = () => {
         setCurrentTime(currentTime)
     }
 
-    const fetchTable = async (tableNo) => {
-        let response = await fetch('https://resturant-server-mssql.vercel.app/api/table')
-        let tables = await response.json()
-        console.log(tables)
+    const fetchTable = async (tableNo) => { 
+        const tables=await getTable()
         const foundTable = tables.find(item => item.TableNo === parseInt(tableNo))
         if (foundTable) {
             const tableType = foundTable.TypeT
-            console.log("found table type", tableType)
             setCurrentTableType(tableType)
         }
     }
 
-    const getUserID = async () => {
-        try {
-            const user=await AsyncStorage.getItem('loginUserID')
-            console.log("userid async",user)        
-            setUserID(user_ID ? user_ID:user)
-
-        } catch (error) {
-            console.error('Error in fetching UserID:', error);
-        }
-
-       
+    const getUserID = async () => {       
+            const user = await AsyncStorage.getItem('loginUserID')
+            setUserID(user_ID ? user_ID : user)      
     }
 
     const memoizedOrderForm = useMemo(() => (
@@ -211,7 +178,6 @@ const OrderForm = () => {
                     placeholder="QTY"
                     value={qty}
                     onChangeText={(value) => setQty(value)}
-
                 />
             </View>
             <View style={styles.formRow}>
@@ -249,11 +215,12 @@ const OrderForm = () => {
                     <Text style={styles.button}>PRINT</Text>
                 </View>
             </View>
+            {loginError && <Text style={styles.errorText}>{loginError}</Text>}
         </ScrollView>
 
-),  [tableNo, itemCode, qty, rate, deptNo, itemName, handleSearch, handleSubmit, handleSaveData]); 
+    ), [tableNo, itemCode, qty, rate, deptNo, itemName,handleSearch, handleSubmit, handleSaveData]);
 
-return memoizedOrderForm;
+    return memoizedOrderForm;
 
 };
 
@@ -299,7 +266,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     logo: {
-        flex: 2,        
+        flex: 2,
     },
     date: {
         flex: 1,
@@ -321,13 +288,21 @@ const styles = StyleSheet.create({
         color: 'red',
         fontWeight: 500,
     },
-    button:{
+    button: {
         fontSize: 16,
         color: '#d9e9f9',
         fontWeight: 500,
-        paddingTop:3
+        paddingTop: 3
 
-    }
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        marginBottom: 10,
+        fontWeight: 500,
+        paddingTop:10,
+        
+    },
 
 
 });

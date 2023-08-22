@@ -1,16 +1,29 @@
-import { NavigationContainer } from '@react-navigation/native'; // Import NavigationContainer
-import { createStackNavigator } from '@react-navigation/stack'; // Import StackNavigator
+import { NavigationContainer } from '@react-navigation/native'; 
+import { createStackNavigator } from '@react-navigation/stack'; 
 import { Provider } from 'react-redux';
 import store from './store/store';
-import { View, Image, StyleSheet, ScrollView } from 'react-native';
+import {  StyleSheet} from 'react-native';
 import LoginScreen from './components/LoginScreen';
 import DashboardScreen from './components/DashboardScreen';
+import {ErrorBoundary} from 'react-error-boundary'
+import { View,Text } from 'react-native';
 
 const Stack = createStackNavigator();
 
+function ErrorHandler() {
+  return (
+    <View role="alert">
+      <Text>An error occurred:</Text>
+      {/* <Text>{error.message}</Text> */}
+     
+    </View>
+  )
+}
+
+
 export default function App() {
   return (
-    // <ScrollView style={styles.container}>
+    <ErrorBoundary FallbackComponent={ErrorHandler}>
       <Provider store={store}>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Login">
@@ -19,7 +32,7 @@ export default function App() {
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
-    // </ScrollView>
+      </ErrorBoundary>
   );
 }
 

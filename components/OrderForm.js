@@ -18,7 +18,7 @@ const OrderForm = () => {
     const user_ID = useSelector(state => state.auth.userID)  
     const dispatch = useDispatch()
     const loginError = useSelector(state => state.auth.error)
-    let error=loginError
+   // let error=loginError
 console.log('loginerror',loginError)
     const [userID, setUserID] = useState('')
     const [currentTableType, setCurrentTableType] = useState('')
@@ -218,7 +218,7 @@ console.log('loginerror',loginError)
             {loginError && <Text style={styles.errorText}>{loginError}</Text>}
         </ScrollView>
 
-    ), [tableNo, itemCode, qty, rate, deptNo, itemName,handleSearch, handleSubmit, handleSaveData]);
+    ), [tableNo, itemCode, qty, rate, deptNo, itemName,loginError,handleSearch, handleSubmit, handleSaveData]);
 
     return memoizedOrderForm;
 
@@ -226,7 +226,7 @@ console.log('loginerror',loginError)
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        // flex: 1,
         padding: 10,
         backgroundColor: '#eef4fc',
     },

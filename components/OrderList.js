@@ -51,7 +51,9 @@ function OrderList({ data }) {
             title="Delete"
             onPress={() => handleDeleteStudent(student?.rowId)}
           /> */}
+          <View style={styles.button_area}>
           <Text style={styles.button_delete} onPress={() => handleDeleteStudent(student?.rowId)}>Delete</Text>
+          </View>
         </ScrollView>
       ))}
     </ScrollView>
@@ -101,5 +103,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#0c3761',
     fontWeight: 500,
+  },
+  button_area:{
+    backgroundColor:'#eeffff',
+    padding:5
   }
 });

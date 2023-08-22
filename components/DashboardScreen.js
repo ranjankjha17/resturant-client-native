@@ -7,6 +7,7 @@ import OrderForm  from './OrderForm';
 import OrderList from './OrderList';
 import RestaurantOrderGrid from './RestaurantOrderGrid';
 import ListExample from './ListExample';
+import FlatListExample from './FlatListExample';
 
 const DashboardScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -31,8 +32,7 @@ const DashboardScreen = ({ navigation }) => {
        <OrderForm/>
          <OrderList/> 
        <RestaurantOrderGrid />    
-      
-   {/* <ListExample/> */}
+   {/* <FlatListExample/> */}
     </ScrollView>
   );
 };

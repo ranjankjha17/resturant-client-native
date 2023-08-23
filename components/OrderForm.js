@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import { useMemo } from 'react';
 import { createOrder, getDate, getTable } from '../services/orderService';
+import * as Print from 'expo-print';
 
 const OrderForm = () => {
     const firstInputRef = useRef(null);
@@ -85,7 +86,7 @@ console.log('loginerror',loginError)
             setItemName('')
             setQty('')
             setRate('')
-            error=''
+            // error=''
             secondInputRef.current.focus();
         }
     };
@@ -142,13 +143,75 @@ console.log('loginerror',loginError)
             setUserID(user_ID ? user_ID : user)      
     }
 
+    const generateHTMLContent = (dataArray) => {
+        const itemsHTML = dataArray.map(item => `
+          <div class="item">
+            <div class="rowId">${item.rowId}</div>
+            <div class="tableNo">${item.tableNo}</div>
+            <div class="itemCode">${item.itemCode}</div>
+            <div class="rate">${item.rate}</div>
+            <div class="qty">${item.qty}</div>
+            <div class="itemName">${item.itemName}</div>
+            <div class="bookingDate">${item.bookingDate}</div>
+            <div class="userID">${item.userID}</div>
+            <div class="currentTableType">${item.currentTableType}</div>
+            <div class="amount">${item.amount}</div>
+          </div>
+        `).join('');
+      
+        return `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                .item {
+                  display: flex;
+                  border: 1px solid #ccc;
+                  padding: 5px;
+                  margin: 5px;
+                }
+                .item > div {
+                  flex: 1;
+                  padding: 5px;
+                  border-right: 1px solid #ccc;
+                }
+              </style>
+            </head>
+            <body>
+            <div class="item">
+            <div class="rowId">rowId</div>
+            <div class="tableNo">tableNo</div>
+            <div class="itemCode">itemCode</div>
+            <div class="rate">rate</div>
+            <div class="qty">qty</div>
+            <div class="itemName">item</div>
+            <div class="bookingDate">bookingDate</div>
+            <div class="userID">userID</div>
+            <div class="currentTableType">currentTableType</div>
+            <div class="amount">amount</div>
+          </div>
+              ${itemsHTML}
+            </body>
+          </html>
+        `;
+      };
+    
+      const handlePrint = async () => {
+        try {
+            const htmlContent = generateHTMLContent(students);
+            await Print.printAsync({ html: htmlContent });
+        } catch (error) {
+          console.error('Error printing:', error.messge);
+        }
+      };
+
     const memoizedOrderForm = useMemo(() => (
         <ScrollView contentContainerStyle={styles.container}>
             {/* <Text style={styles.date}>UserID:{userID}</Text> */}
             <View style={styles.header}>
                 <Text style={styles.date}>{date}</Text>
                 <Logo style={styles.logo} />
-                <View>
+                <View style={styles.time_area}>
                     <Text style={styles.time}>{currentTime}</Text>
                     {/* currentTime.toLocaleTimeString() */}
                     <Text style={styles.tableType}>{currentTableType}</Text>
@@ -212,7 +275,7 @@ console.log('loginerror',loginError)
                     <Text style={styles.button} onPress={handleSaveData}>KOT</Text>
                 </View>
                 <View style={styles.button_area}>
-                    <Text style={styles.button}>PRINT</Text>
+                    <Text style={styles.button} onPress={handlePrint}>PRINT</Text>
                 </View>
             </View>
             {loginError && <Text style={styles.errorText}>{loginError}</Text>}
@@ -263,10 +326,11 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        // alignItems:"center"
     },
     logo: {
-        flex: 2,
+        flex: 1,
     },
     date: {
         flex: 1,
@@ -274,6 +338,10 @@ const styles = StyleSheet.create({
         color: 'red',
         fontWeight: 500,
         marginTop: 88
+    },
+    time_area:{
+flex:1,
+alignItems:"flex-end"
     },
     time: {
         flex: 1,

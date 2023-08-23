@@ -6,6 +6,7 @@ import { login, loginFailure } from '../reducers/login';
 import { createLogin } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
+import Logo2 from './Logo2';
 
 const LoginScreen = () => {
     const dispatch = useDispatch();
@@ -51,7 +52,7 @@ const LoginScreen = () => {
     }, [dispatch, isLoggedIn])
     const checkLoggedInStatus = async () => {
         const storedToken = await AsyncStorage.getItem('loginToken');
-      //  console.log(storedToken)
+        //  console.log(storedToken)
         if (storedToken) {
             dispatch(login(userID));
         }
@@ -59,25 +60,30 @@ const LoginScreen = () => {
 
 
     const memoizedLogin = useMemo(() => (
-        <View style={styles.container}>
-            <Text style={styles.heading}>Login</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="UserID"
-                value={userID}
-                onChangeText={setUSerID}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-            />
-            {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
-            {loginError && <Text style={styles.errorText}>{loginError}</Text>}            
-            <View style={styles.button_area}>
-                <Text onPress={handleLogin} style={styles.label}>Login</Text>
+        <View style={{backgroundColor:'#eef4fc'}}>
+            <View>
+                <Logo2 style={styles.logo} />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.heading}>Login</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="UserID"
+                    value={userID}
+                    onChangeText={setUSerID}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                />
+                {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+                {loginError && <Text style={styles.errorText}>{loginError}</Text>}
+                <View style={styles.button_area}>
+                    <Text onPress={handleLogin} style={styles.label}>Login</Text>
+                </View>
             </View>
         </View>
     ), [userID, password, loginError, errorMessage]);
@@ -87,10 +93,14 @@ const LoginScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        // flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#eef4fc',
+       // backgroundColor: '#eef4fc',
+       //height:'100vh'
+    },
+    logo: {
+        // flex: 1,
     },
     heading: {
         fontSize: 24,

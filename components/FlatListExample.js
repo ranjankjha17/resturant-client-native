@@ -84,6 +84,7 @@ return (
   <ScrollView style={styles.container}>
     <FlatList
       data={persons}
+      scrollEnabled={false}
       renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
       keyExtractor={(item) => item.id}
       ItemSeparatorComponent={myItemSeparator}

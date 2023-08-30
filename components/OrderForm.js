@@ -7,7 +7,7 @@ import { addStudent, resetStudents } from '../reducers/temp_order';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import { useMemo } from 'react';
-import { createOrder, getDate, getTable } from '../services/orderService';
+import { createOrder, getDate, getPrintOrders, getTable } from '../services/orderService';
 import * as Print from 'expo-print';
 
 const OrderForm = () => {
@@ -16,11 +16,11 @@ const OrderForm = () => {
     let data;
     const orders = useSelector(state => state.orders)
     const students = useSelector(state => state.tempOrder.students);
-    const user_ID = useSelector(state => state.auth.userID)  
+    const user_ID = useSelector(state => state.auth.userID)
     const dispatch = useDispatch()
     const loginError = useSelector(state => state.auth.error)
-   // let error=loginError
-console.log('loginerror',loginError)
+    // let error=loginError
+    console.log('loginerror', loginError)
     const [userID, setUserID] = useState('')
     const [currentTableType, setCurrentTableType] = useState('')
     const [currentTime, setCurrentTime] = useState('')//pass argument new Date() for live interval
@@ -35,7 +35,7 @@ console.log('loginerror',loginError)
     const rowId = parseInt(uuidValue.substring(0, 4), 16);
     let amount = parseInt(rate) * parseInt(qty)
     let bookingDate = date
-  
+
     useEffect(() => {
         firstInputRef.current.focus();
         dispatch(fetchItems())
@@ -74,7 +74,7 @@ console.log('loginerror',loginError)
             deptNo === '' ||
             itemName === ''
         ) {
-            alert('All fields are required');           
+            alert('All fields are required');
         }
         else {
             data = {
@@ -91,8 +91,8 @@ console.log('loginerror',loginError)
         }
     };
 
-    const handleSaveData = async () => {    
-        const response = await createOrder(students,dispatch)
+    const handleSaveData = async () => {
+        const response = await createOrder(students, dispatch)
         if (response) {
             dispatch(resetStudents());
             AsyncStorage.removeItem('students');
@@ -103,9 +103,9 @@ console.log('loginerror',loginError)
         }
     }
 
-    const fetchDate = async () => {         
-            const result=await getDate()
-            if(result){         
+    const fetchDate = async () => {
+        const result = await getDate()
+        if (result) {
             const dateString = result[0].TDate
             const date = new Date(dateString)
             const day = date.getUTCDate()
@@ -115,7 +115,7 @@ console.log('loginerror',loginError)
             const formattedMonth = month < 10 ? `0${month}` : month;
             const formattedDateStr = `${formattedDay}-${formattedMonth}-${year}`;
             setDate(formattedDateStr)
-            }       
+        }
     }
 
     const getCurrentTime = () => {
@@ -129,8 +129,8 @@ console.log('loginerror',loginError)
         setCurrentTime(currentTime)
     }
 
-    const fetchTable = async (tableNo) => { 
-        const tables=await getTable()
+    const fetchTable = async (tableNo) => {
+        const tables = await getTable()
         const foundTable = tables.find(item => item.TableNo === parseInt(tableNo))
         if (foundTable) {
             const tableType = foundTable.TypeT
@@ -138,27 +138,28 @@ console.log('loginerror',loginError)
         }
     }
 
-    const getUserID = async () => {       
-            const user = await AsyncStorage.getItem('loginUserID')
-            setUserID(user_ID ? user_ID : user)      
+    const getUserID = async () => {
+        const user = await AsyncStorage.getItem('loginUserID')
+        setUserID(user_ID ? user_ID : user)
     }
 
-    const generateHTMLContent = (dataArray) => {
-        const itemsHTML = dataArray.map(item => `
+    const generateHTMLContent = (printOrders) => {
+        let totalAmount = 0;
+        const itemsHTML = printOrders.map(item => {
+            totalAmount += item.Amount
+            return (
+                `
           <div class="item">
-            <div class="rowId">${item.rowId}</div>
-            <div class="tableNo">${item.tableNo}</div>
-            <div class="itemCode">${item.itemCode}</div>
-            <div class="rate">${item.rate}</div>
-            <div class="qty">${item.qty}</div>
-            <div class="itemName">${item.itemName}</div>
-            <div class="bookingDate">${item.bookingDate}</div>
-            <div class="userID">${item.userID}</div>
-            <div class="currentTableType">${item.currentTableType}</div>
-            <div class="amount">${item.amount}</div>
+          <div class="itemName">${item.ItemName}</div> 
+            <div class="rate">${item.Rate}</div>
+            <div class="qty">${item.Qty}</div>                   
+            <div class="amount">${item.Amount}</div>
           </div>
-        `).join('');
-      
+        `  )
+        }
+
+        ).join('');
+
         return `
           <!DOCTYPE html>
           <html>
@@ -175,35 +176,41 @@ console.log('loginerror',loginError)
                   padding: 5px;
                   border-right: 1px solid #ccc;
                 }
+                .item.total {
+                    font-weight: bold;
+                    background-color: #f0f0f0;
+                  }
               </style>
             </head>
             <body>
             <div class="item">
-            <div class="rowId">rowId</div>
-            <div class="tableNo">tableNo</div>
-            <div class="itemCode">itemCode</div>
-            <div class="rate">rate</div>
-            <div class="qty">qty</div>
-            <div class="itemName">item</div>
-            <div class="bookingDate">bookingDate</div>
-            <div class="userID">userID</div>
-            <div class="currentTableType">currentTableType</div>
-            <div class="amount">amount</div>
+            <div class="itemName">ItemName</div>   
+            <div class="rate">Rate</div>
+            <div class="qty">Qty</div>                     
+            <div class="amount">Amount</div>
           </div>
               ${itemsHTML}
+              <div class="item total">
+              <div></div>
+              <div></div>
+              <div class="itemName">Total Amount:</div>
+              <div class="amount">${totalAmount}</div>
+            </div>
             </body>
           </html>
         `;
-      };
-    
-      const handlePrint = async () => {
+    };
+
+    const handlePrint = async () => {
         try {
-            const htmlContent = generateHTMLContent(students);
+            const printOrders = await getPrintOrders()
+            console.log('print orders', printOrders)
+            const htmlContent = generateHTMLContent(printOrders);
             await Print.printAsync({ html: htmlContent });
         } catch (error) {
-          console.error('Error printing:', error.messge);
+            console.error('Error printing:', error.messge);
         }
-      };
+    };
 
     const memoizedOrderForm = useMemo(() => (
         <ScrollView contentContainerStyle={styles.container}>
@@ -281,7 +288,7 @@ console.log('loginerror',loginError)
             {loginError && <Text style={styles.errorText}>{loginError}</Text>}
         </ScrollView>
 
-    ), [tableNo, itemCode, qty, rate, deptNo, itemName,loginError,handleSearch, handleSubmit, handleSaveData]);
+    ), [tableNo, itemCode, qty, rate, deptNo, itemName, loginError, handleSearch, handleSubmit, handleSaveData]);
 
     return memoizedOrderForm;
 
@@ -339,9 +346,9 @@ const styles = StyleSheet.create({
         fontWeight: 500,
         marginTop: 88
     },
-    time_area:{
-flex:1,
-alignItems:"flex-end"
+    time_area: {
+        flex: 1,
+        alignItems: "flex-end"
     },
     time: {
         flex: 1,
@@ -368,8 +375,8 @@ alignItems:"flex-end"
         fontSize: 14,
         marginBottom: 10,
         fontWeight: 500,
-        paddingTop:10,
-        
+        paddingTop: 10,
+
     },
 
 

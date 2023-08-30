@@ -47,3 +47,11 @@ export const getTable = async () => {
   }
 }
 
+export const getPrintOrders = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/viewKOT`)
+    return response.data    
+  } catch (e) {
+    console.log(e.message)
+  }
+}

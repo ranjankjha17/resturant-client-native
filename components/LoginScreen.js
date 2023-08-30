@@ -6,7 +6,7 @@ import { login, loginFailure } from '../reducers/login';
 import { createLogin } from '../services/userService';
 import { useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
-import Logo2 from './Logo2';
+import Logo from './Logo';
 
 const LoginScreen = () => {
     const dispatch = useDispatch();
@@ -62,7 +62,7 @@ const LoginScreen = () => {
     const memoizedLogin = useMemo(() => (
         <View style={{backgroundColor:'#eef4fc'}}>
             <View>
-                <Logo2 style={styles.logo} />
+                <Logo style={styles.logo} />
             </View>
             <View style={styles.container}>
                 <Text style={styles.heading}>Login</Text>

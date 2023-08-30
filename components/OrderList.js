@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   container2: { 
     padding: 10,
-    flex:1
+    // flex:1
    },
   formRow: {
     flexDirection: 'row',

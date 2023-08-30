@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import PrintScreen from './PrintScreen';
 import FlatListOrder from './FlatListOrder';
+import View_KOT from './View/View_KOT';
 
 const DashboardScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -37,7 +38,7 @@ const DashboardScreen = ({ navigation }) => {
 
   useEffect(() => {
     getUserID()
-  }, [])
+  }, [user_ID])
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingRight: 20, paddingTop: 10 }}>
@@ -46,8 +47,7 @@ const DashboardScreen = ({ navigation }) => {
       {
         user_ID === 'admin'
           ?
-          (<FlatListExample />)
-
+          (<FlatListExample/>)
           :
           (
             <>
@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#eef4fc',
     justifyContent: 'center',
+    
 
   },
 });

@@ -20,10 +20,10 @@ const OrderForm = () => {
     const dispatch = useDispatch()
     const loginError = useSelector(state => state.auth.error)
     // let error=loginError
-    console.log('loginerror', loginError)
+  //  console.log('loginerror', loginError)
     const [userID, setUserID] = useState('')
     const [currentTableType, setCurrentTableType] = useState('')
-    const [currentTime, setCurrentTime] = useState('')//pass argument new Date() for live interval
+    const [currentTime, setCurrentTime] = useState(new Date())//pass argument new Date() for live interval
     const [date, setDate] = useState('')
     const [itemCode, setItemCode] = useState('');
     const [rate, setRate] = useState('');
@@ -41,15 +41,15 @@ const OrderForm = () => {
         dispatch(fetchItems())
         fetchDate()
         getUserID()
-        getCurrentTime()
+       // getCurrentTime()
         fetchTable(tableNo)
-        //     const interval = setInterval(() => {
-        //         setCurrentTime(new Date());
-        //       }, 1000); 
+            const interval = setInterval(() => {
+                setCurrentTime(new Date());
+              }, 1000); 
 
-        //    return () => {
-        //     clearInterval(interval); 
-        //   };
+           return () => {
+            clearInterval(interval); 
+          };
     }, [dispatch, tableNo])
 
     const handleSearch = (text) => {
@@ -78,7 +78,7 @@ const OrderForm = () => {
         }
         else {
             data = {
-                rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType, amount
+                rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType,bookingTime,amount
             }
             dispatch(addStudent(data));
             setItemCode('')
@@ -118,16 +118,19 @@ const OrderForm = () => {
         }
     }
 
-    const getCurrentTime = () => {
-        const currentDate = new Date();
-        const hours = currentDate.getHours();
-        const minutes = currentDate.getMinutes();
-        const seconds = currentDate.getSeconds();
+    const getBookTime = (time) => {
+       // const currentDate = new Date();
+        const hours = time.getHours();
+        const minutes = time.getMinutes();
+        const seconds = time.getSeconds();
         const formattedHours = hours < 10 ? `0${hours}` : hours;
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-        const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds; const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-        setCurrentTime(currentTime)
+        const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+        const ampm = hours >= 12 ? 'PM' : 'AM';         
+        const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+        return(currentTime)       
     }
+    const bookingTime=getBookTime(currentTime)
 
     const fetchTable = async (tableNo) => {
         const tables = await getTable()
@@ -143,17 +146,34 @@ const OrderForm = () => {
         setUserID(user_ID ? user_ID : user)
     }
 
+
+
     const generateHTMLContent = (printOrders) => {
-        let totalAmount = 0;
-        const itemsHTML = printOrders.map(item => {
-            totalAmount += item.Amount
+        const inputDateStr = printOrders[0].BDate
+        function conver_date( inputDateStr){
+            const inputDate = new Date(inputDateStr);
+
+            const day = inputDate.getDate();
+            const month = inputDate.getMonth() + 1; 
+            const year = inputDate.getFullYear();
+            
+            const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+            return formattedDate
+        }   
+        const headerHTML = `
+        <h2 style="text-align: center;">${printOrders[0].Company}</h2>
+        <div style="text-align: center; padding: 5px;">
+            <p>Date: ${conver_date(inputDateStr)}</p>
+            <p>Time: ${printOrders[0].BTime}</p>
+            <p>Table No: ${printOrders[0].TableNo}</p>
+        </div>
+    `;    
+        const itemsHTML = printOrders.map(item => {           
             return (
                 `
           <div class="item">
           <div class="itemName">${item.ItemName}</div> 
-            <div class="rate">${item.Rate}</div>
             <div class="qty">${item.Qty}</div>                   
-            <div class="amount">${item.Amount}</div>
           </div>
         `  )
         }
@@ -183,19 +203,13 @@ const OrderForm = () => {
               </style>
             </head>
             <body>
+            ${headerHTML}     
             <div class="item">
-            <div class="itemName">ItemName</div>   
-            <div class="rate">Rate</div>
-            <div class="qty">Qty</div>                     
-            <div class="amount">Amount</div>
+            <div class="itemName">ItemName</div>             
+            <div class="qty">Qty</div>                   
           </div>
               ${itemsHTML}
-              <div class="item total">
-              <div></div>
-              <div></div>
-              <div class="itemName">Total Amount:</div>
-              <div class="amount">${totalAmount}</div>
-            </div>
+              
             </body>
           </html>
         `;
@@ -204,7 +218,7 @@ const OrderForm = () => {
     const handlePrint = async () => {
         try {
             const printOrders = await getPrintOrders()
-            console.log('print orders', printOrders)
+           // console.log('print orders', printOrders)
             const htmlContent = generateHTMLContent(printOrders);
             await Print.printAsync({ html: htmlContent });
         } catch (error) {
@@ -219,7 +233,7 @@ const OrderForm = () => {
                 <Text style={styles.date}>{date}</Text>
                 <Logo style={styles.logo} />
                 <View style={styles.time_area}>
-                    <Text style={styles.time}>{currentTime}</Text>
+                    <Text style={styles.time}>{currentTime.toLocaleTimeString()}</Text>
                     {/* currentTime.toLocaleTimeString() */}
                     <Text style={styles.tableType}>{currentTableType}</Text>
                 </View>

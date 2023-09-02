@@ -17,7 +17,7 @@ import View_KOT from './View/View_KOT';
 const DashboardScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { userID, isLoggedIn } = useSelector(state => state.auth)
-  console.log(userID, isLoggedIn)
+  //console.log(userID, isLoggedIn)
   const [user_ID, setUser_ID] = useState('')
   const handleLogout = async () => {
     dispatch(logout());

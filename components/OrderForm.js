@@ -20,7 +20,7 @@ const OrderForm = () => {
     const dispatch = useDispatch()
     const loginError = useSelector(state => state.auth.error)
     // let error=loginError
-  //  console.log('loginerror', loginError)
+    //  console.log('loginerror', loginError)
     const [userID, setUserID] = useState('')
     const [currentTableType, setCurrentTableType] = useState('')
     const [currentTime, setCurrentTime] = useState(new Date())//pass argument new Date() for live interval
@@ -41,15 +41,15 @@ const OrderForm = () => {
         dispatch(fetchItems())
         fetchDate()
         getUserID()
-       // getCurrentTime()
+        // getCurrentTime()
         fetchTable(tableNo)
-            const interval = setInterval(() => {
-                setCurrentTime(new Date());
-              }, 1000); 
+        const interval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
 
-           return () => {
-            clearInterval(interval); 
-          };
+        return () => {
+            clearInterval(interval);
+        };
     }, [dispatch, tableNo])
 
     const handleSearch = (text) => {
@@ -78,7 +78,7 @@ const OrderForm = () => {
         }
         else {
             data = {
-                rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType,bookingTime,amount
+                rowId, tableNo, itemCode, rate, qty, itemName, bookingDate, userID, currentTableType, bookingTime, amount
             }
             dispatch(addStudent(data));
             setItemCode('')
@@ -119,18 +119,18 @@ const OrderForm = () => {
     }
 
     const getBookTime = (time) => {
-       // const currentDate = new Date();
+        // const currentDate = new Date();
         const hours = time.getHours();
         const minutes = time.getMinutes();
         const seconds = time.getSeconds();
         const formattedHours = hours < 10 ? `0${hours}` : hours;
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
         const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-        const ampm = hours >= 12 ? 'PM' : 'AM';         
+        const ampm = hours >= 12 ? 'PM' : 'AM';
         const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
-        return(currentTime)       
+        return (currentTime)
     }
-    const bookingTime=getBookTime(currentTime)
+    const bookingTime = getBookTime(currentTime)
 
     const fetchTable = async (tableNo) => {
         const tables = await getTable()
@@ -150,16 +150,16 @@ const OrderForm = () => {
 
     const generateHTMLContent = (printOrders) => {
         const inputDateStr = printOrders[0].BDate
-        function conver_date( inputDateStr){
+        function conver_date(inputDateStr) {
             const inputDate = new Date(inputDateStr);
 
             const day = inputDate.getDate();
-            const month = inputDate.getMonth() + 1; 
+            const month = inputDate.getMonth() + 1;
             const year = inputDate.getFullYear();
-            
+
             const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
             return formattedDate
-        }   
+        }
         const headerHTML = `
         <h2 style="text-align: center;">${printOrders[0].Company}</h2>
         <div style="text-align: center; padding: 5px;">
@@ -167,8 +167,8 @@ const OrderForm = () => {
             <p>Time: ${printOrders[0].BTime}</p>
             <p>Table No: ${printOrders[0].TableNo}</p>
         </div>
-    `;    
-        const itemsHTML = printOrders.map(item => {           
+    `;
+        const itemsHTML = printOrders.map(item => {
             return (
                 `
           <div class="item">
@@ -218,7 +218,7 @@ const OrderForm = () => {
     const handlePrint = async () => {
         try {
             const printOrders = await getPrintOrders()
-           // console.log('print orders', printOrders)
+            // console.log('print orders', printOrders)
             const htmlContent = generateHTMLContent(printOrders);
             await Print.printAsync({ html: htmlContent });
         } catch (error) {

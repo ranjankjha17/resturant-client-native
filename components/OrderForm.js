@@ -139,23 +139,18 @@ const OrderForm = () => {
             setCurrentTableType(tableType)
         }
     }
-
     const getUserID = async () => {
         const user = await AsyncStorage.getItem('loginUserID')
         setUserID(user_ID ? user_ID : user)
     }
 
-
-
     const generateHTMLContent = (printOrders) => {
         const inputDateStr = printOrders[0].BDate
         function conver_date(inputDateStr) {
             const inputDate = new Date(inputDateStr);
-
             const day = inputDate.getDate();
             const month = inputDate.getMonth() + 1;
             const year = inputDate.getFullYear();
-
             const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
             return formattedDate
         }
@@ -174,7 +169,7 @@ const OrderForm = () => {
             return (
                 `
           <div class="item">
-          <div class="itemName">${item.ItemName}</div> 
+            <div class="itemName">${item.ItemName}</div> 
             <div class="qty">${item.Qty}</div>                   
           </div>
         `  )
@@ -394,8 +389,6 @@ const styles = StyleSheet.create({
         paddingTop: 10,
 
     },
-
-
 });
 
 export default OrderForm

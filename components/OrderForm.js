@@ -40,8 +40,7 @@ const OrderForm = () => {
         firstInputRef.current.focus();
         dispatch(fetchItems())
         fetchDate()
-        getUserID()
-        // getCurrentTime()
+        getUserID()       
         fetchTable(tableNo)
         const interval = setInterval(() => {
             setCurrentTime(new Date());

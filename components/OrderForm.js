@@ -161,10 +161,13 @@ const OrderForm = () => {
         }
         const headerHTML = `
         <h2 style="text-align: center;">${printOrders[0].Company}</h2>
-        <div style="text-align: center; padding: 5px;">
+        <div style="display: flex; justify-content: space-between; padding-left: 5px; padding-right: 5px;">
             <p>Date: ${conver_date(inputDateStr)}</p>
             <p>Time: ${printOrders[0].BTime}</p>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding-left: 5px; padding-right: 5px;">
             <p>Table No: ${printOrders[0].TableNo}</p>
+            <p>KOT No: ${printOrders[0].KOT_No}</p>
         </div>
     `;
         const itemsHTML = printOrders.map(item => {
@@ -217,7 +220,7 @@ const OrderForm = () => {
     const handlePrint = async () => {
         try {
             const printOrders = await getPrintOrders()
-            // console.log('print orders', printOrders)
+            //console.log('print orders', printOrders)
             const htmlContent = generateHTMLContent(printOrders);
             await Print.printAsync({ html: htmlContent });
         } catch (error) {

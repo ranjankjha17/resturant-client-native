@@ -6,13 +6,9 @@ import { logout } from '../reducers/login';
 import OrderForm from './OrderForm';
 import OrderList from './OrderList';
 import RestaurantOrderGrid from './RestaurantOrderGrid';
-import ListExample from './ListExample';
 import FlatListExample from './FlatListExample';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import PrintScreen from './PrintScreen';
-import FlatListOrder from './FlatListOrder';
-import View_KOT from './View/View_KOT';
 
 const DashboardScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -53,9 +49,7 @@ const DashboardScreen = ({ navigation }) => {
             <>
               <OrderForm />
               <OrderList />
-              <RestaurantOrderGrid />
-              {/* <FlatListOrder/> 
-            <FlatListExample/> */}
+              <RestaurantOrderGrid />              
             </>
           )
       }
